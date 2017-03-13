@@ -3,8 +3,8 @@ CFLAGS=-ansi -Wall -Wextra -O3
 CLIBS=
 EXE=prog
 OBJ=obj/
-SRC=./
-INCL=./
+SRC=src/
+INCL=src/
 FILEC:= $(wildcard $(SRC)*.c)
 FILEO:= $(patsubst $(SRC)%.c,$(OBJ)%.o,$(FILEC))
 
