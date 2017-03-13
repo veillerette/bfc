@@ -1,5 +1,5 @@
 CC=colorgcc
-CFLAGS=-ansi -Wall -Wextra -O2
+CFLAGS=-ansi -Wall -Wextra -O3
 CLIBS=
 EXE=prog
 OBJ=obj/

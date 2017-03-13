@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
 		{
 			case 'O':
 				isopti = 1;
-				printf("isopti=1\n");
 				break;
 			default:
 				break;
@@ -37,15 +36,12 @@ int main(int argc, char *argv[])
 	
 	lst = BFInstr_Open(argv[optind]);
 	
-	printf("oppened\n");
 	
 	if(!VerifBF(lst, argv[optind]))
 	{
 		BFInstrList_Free(&lst);
 		exit(EXIT_FAILURE);
 	}
-	
-	printf("verified\n");
 	
 	pathdest = Nasm_GetPathDest(argv[optind]);
 	f = Trad_OpenDestFile(pathdest);
@@ -56,15 +52,13 @@ int main(int argc, char *argv[])
 	if(isopti)
 	{
 		opti = BFList_Optimise1(lst);
-		Trad_Nasm(f, opti, 01);
+		Trad_Nasm(f, opti, O1);
 		BFInstrList_Free(&opti);
 	}
 	else
 	{
 		Trad_Nasm(f, lst, SHORT_STACK);	
 	}
-	
-	printf("nasmed\n");
 	
 	
 	BFInstrList_Free(&lst);
