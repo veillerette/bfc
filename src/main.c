@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
 	{
 		opti = BFList_Optimise1(lst);
 		Trad_Nasm(f, opti, O1);
+		BFList_Debug(opti);
 		BFInstrList_Free(&opti);
 	}
 	else

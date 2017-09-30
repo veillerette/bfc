@@ -54,15 +54,21 @@ extern void BFInstrList_Free(BFInstrList **bfins)
 	}
 }
 
-BFInstrVal BFInstrVal_Set(BFInstr ins, int val)
+BFInstrVal BFInstrValPtr_Set(BFInstr ins, int val, int ptr)
 {
 	BFInstrVal temp;
 	temp.ins = ins;
 	temp.val = val;
-	return temp;
+	temp.ptr = ptr;
+	return temp;	
 }
 
-int BFInstrList_Add(BFInstrList *bfins, BFInstr instr, int val, int line, int col)
+BFInstrVal BFInstrVal_Set(BFInstr ins, int val)
+{
+	return BFInstrValPtr_Set(ins, val, -1);
+}
+
+int BFInstrList_Add(BFInstrList *bfins, BFInstr instr, int val, int ptr, int line, int col)
 {
 	if((NULL == bfins) || (NULL == bfins->lst))
 		return 0;
@@ -85,7 +91,7 @@ int BFInstrList_Add(BFInstrList *bfins, BFInstr instr, int val, int line, int co
 		}
 	}
 	
-	bfins->lst[bfins->n] = BFInstrVal_Set(instr, val);
+	bfins->lst[bfins->n] = BFInstrValPtr_Set(instr, val, ptr);
 	bfins->pos[bfins->n] = InstrPos_Set(line, col);
 	bfins->n++;
 	
@@ -127,12 +133,14 @@ extern BFInstrList *BFInstr_Open(const char *path)
 			case '\n':
 				col = 1;
 				line++;
+				choose = -1;
+				break;
 			default:
 				choose = -1;
 				break;
 		}
 		if(choose != -1)
-			if(!BFInstrList_Add(lst, choose, val, line, col))
+			if(!BFInstrList_Add(lst, choose, val, -1, line, col))
 			{
 				fprintf(stderr, "[DevError 2v]\n");
 				exit(EXIT_FAILURE);
@@ -274,6 +282,53 @@ int BFInstr_isNegative(BFInstr ins)
 		return 1;
 	return 0;
 }
+/*
+extern BFInstrList *BFList_Optimise2(BFInstrList *source)
+{
+	BFInstrList *res = NULL;
+	int i,j;
+	BFInstrVal ins, ins_temp;
+	BFInstrVal current;
+	int ptr = 0, ptr_temp;
+	
+	res = BFInstrList_Alloc();
+	
+	i = 0;
+	ptr = 0;
+	ptr_temp = 0;
+	while(i < source->n)
+	{
+		ins = source->lst[i];
+		ins.ptr = ptr;
+		j = i+1;
+		while(j < source->n)
+		{
+			ins_temp = source->lst[j];
+			switch(ins_temp->ins)
+			{
+				case ADD:
+					ptr_temp += ins_temp.val;
+					break;
+				case SUB:
+					ptr_temp += ins_temp.val;
+					break;
+				case INC:
+					if(ptr_temp == ptr)
+						ins.val += ins_temp.val;
+					break;
+				case DEC:
+					if(ptr_temp == ptr)
+						ins.val -= ins_temp.val;
+					break;
+				default:
+					BFInstrList_Add(res, ins.ins, ins.val, 
+						ins.ptr, source->pos[i].line, 
+						source->pos[i].col);
+			}
+			j++;
+		}
+	}
+}*/
 
 extern BFInstrList *BFList_Optimise1(BFInstrList *source)
 {
@@ -330,7 +385,7 @@ extern BFInstrList *BFList_Optimise1(BFInstrList *source)
 		else if(ins.ins >= ADD && ins.ins <= DEC)
 			continue;
 		
-		if(!BFInstrList_Add(res, ins.ins, ins.val, 0, 0))
+		if(!BFInstrList_Add(res, ins.ins, ins.val, -1, 0, 0))
 		{
 			fprintf(stderr, "[DevError 2o]\n");
 			exit(EXIT_FAILURE);

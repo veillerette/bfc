@@ -44,6 +44,7 @@ struct BFInstrVal
 {
 	BFInstr ins;
 	int val;
+	int ptr;
 };
 
 typedef struct BFInstrList BFInstrList;
@@ -58,13 +59,17 @@ struct BFInstrList
 	int is_out;
 };
 
+BFInstrVal BFInstrValPtr_Set(BFInstr ins, int val, int ptr);
+
+BFInstrVal BFInstrVal_Set(BFInstr ins, int val);
+
 extern InstrPos InstrPos_Set(int line, int col);
 
 extern BFInstrList *BFInstrList_Alloc(void);
 
 extern void BFInstrList_Free(BFInstrList **bfins);
 
-int BFInstrList_Add(BFInstrList *bfins, BFInstr instr, int val, int line, int col);
+int BFInstrList_Add(BFInstrList *bfins, BFInstr instr, int val, int ptr, int line, int col);
 
 extern BFInstrList *BFInstr_Open(const char *path);
 

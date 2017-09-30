@@ -14,15 +14,15 @@ static int Nasm_HeadFile(FILE *f, Trad_Option opt, BFInstrList *bf)
 		fprintf(f, "b");
 	fprintf(f, "\t30000\n");
 	fprintf(f, "section .text\n");
-	fprintf(f, "global main\n");
+	fprintf(f, "global _start\n");
 	
-	if(bf->is_out)
-	       fprintf(f, "extern putchar\n");
-	       
+	/*if(bf->is_out)
+	       fprintf(f, "extern putchar\n");     
 	if(bf->is_in)
 	       fprintf(f, "extern getchar\n");
-	       
-	fprintf(f, "\nmain:");
+	*/
+	
+	fprintf(f, "\n_start:");
 	
 	return 1;	
 }
@@ -135,17 +135,29 @@ int Nasm_WriteBody(FILE *f, BFInstrList *bf, Trad_Option opt, int *begin, int *i
 			break;
 			
 		case OUT:
-			sprintf(strIns, "movzx");
+			/*sprintf(strIns, "movzx");
 			sprintf(strArg, "rdi, %s [rbp]", size);
 			NWI(strIns, strArg);
 			sprintf(strIns, "call");
-			sprintf(strArg, "putchar");
+			sprintf(strArg, "putchar");*/
+			NWI("mov", "eax, 4");
+			NWI("mov", "ebx, 1");
+			NWI("mov", "rcx, rbp");
+			NWI("mov", "edx, 1");
+			sprintf(strIns, "int");
+			sprintf(strArg, "0x80");
 			break;
 			
 		case IN:
-			NWI("call", "getchar");
+			/*NWI("call", "getchar");
 			sprintf(strIns, "mov");
-			sprintf(strArg, "[rbp], %s", bufReg);
+			sprintf(strArg, "[rbp], %s", bufReg);*/
+			NWI("mov", "eax, 3");
+			NWI("mov", "ebx, 0");
+			NWI("mov", "rcx, rbp");
+			NWI("mov", "edx, 1");
+			sprintf(strIns, "int");
+			sprintf(strArg, "0x80");
 			break;
 			
 		case BRANCH:
@@ -200,7 +212,9 @@ int Trad_Nasm(FILE *f, BFInstrList *bf, Trad_Option opt)
 		NWI("mov", "eax, 0");
 		NWI("pop", "rbp");
 	}
-	NWI("ret", "");
+	NWI("mov", "eax, 1");
+	NWI("mov", "ebx, 0");
+	NWI("int", "0x80");
 	
 	Nasm_EndFile(f);
 	
